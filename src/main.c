@@ -1,42 +1,56 @@
+#include "../include/file_io.h"
 #include "../include/task.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int main(int argc, char *argv[]) {
   (void)argc;
   (void)argv;
 
+  const char *db_path = "data/tasks.txt";
   Task minhas_tarefas[MAX_TASKS] = {0};
   int total = 0;
 
-  printf("=== TESTE DA SPRINT 5: O CEIFADOR DE MEMÓRIA ===\n\n");
+  printf("=== TESTE DA SPRINT 6: PERSISTÊNCIA EM DISCO (I/O) ===\n\n");
 
-  /* Criando 3 tarefas sequenciais */
-  create_task(minhas_tarefas, &total, MAX_TASKS, "Comprar Cafe", "Grao moido",
-              1);
-  create_task(minhas_tarefas, &total, MAX_TASKS, "Estudar Alocacao",
-              "Ponteiros", 3);
-  create_task(minhas_tarefas, &total, MAX_TASKS, "Pagar Boleto", "Faculdade",
-              2);
+  /* 1. Criando dados na RAM */
+  create_task(minhas_tarefas, &total, MAX_TASKS, "Dominar I/O em C",
+              "fget e fprintf", 3);
+  create_task(minhas_tarefas, &total, MAX_TASKS, "Tarefa sem Descricao", "",
+              1); /* Testando o "-" */
+  minhas_tarefas[0].status = STATUS_IN_PROGRESS;
 
-  printf("-> CENÁRIO 1: Lista original com 3 itens:\n");
+  printf("-> 1. ESTADO ORIGINAL NA RAM ANTES DE SALVAR:\n");
   list_tasks(minhas_tarefas, total);
 
-  /* O teste de fogo: Vamos deletar a do MEIO (ID 2).
-     Se o shift left falhar, a tabela vai quebrar ou duplicar itens. */
-  printf("\n-> Executando Ceifador no ID 2 ('Estudar Alocacao')...\n");
-  int res_del = delete_task_by_id(minhas_tarefas, &total, 2);
+  /* 2. Gravando no SSD */
+  printf("\n-> 2. Salvando dados em '%s'...\n", db_path);
+  int res_save = save_tasks_to_file(minhas_tarefas, total, db_path);
+  if (res_save == 0)
+    printf("   [OK] Arquivo gravado com sucesso!\n");
 
-  printf("\n-> CENÁRIO 2: Lista após a deleção (Esperado: IDs 1 e 3 | Total: 2 "
-         "itens):\n");
+  /* 3. SIMULANDO O APOCALIPSE (Limpando a RAM) */
+  printf("\n-> 3. SIMULANDO QUEDA DE ENERGIA (Limpando a Stack de Memória)...");
+  memset(minhas_tarefas, 0, sizeof(minhas_tarefas));
+  total = 0;
+  printf(" [MEMÓRIA ZERADA]\n");
+
+  /* 4. A Ressurreição */
+  printf("\n-> 4. Carregando dados do HD de volta para a RAM...\n");
+  int res_load =
+      load_tasks_from_file(minhas_tarefas, &total, MAX_TASKS, db_path);
+
+  /* Tratando a variável res_load para eliminar o erro de compilação */
+  if (res_load == 0) {
+    printf("   [OK] Arquivo lido e desserializado com sucesso!\n");
+  } else {
+    printf("   [ERRO] Falha catastrófica ao ler o arquivo. Codigo: %d\n",
+           res_load);
+  }
+
+  printf("\n-> 5. TABELA RECONSTRUÍDA A PARTIR DO DISCO RÍGIDO:\n");
   list_tasks(minhas_tarefas, total);
-
-  /* Testando a resiliência contra um ID fantasma */
-  int res_fantasma = delete_task_by_id(minhas_tarefas, &total, 888);
-
-  printf("\n-> AUDITORIA DE RETORNO:\n");
-  printf("   - Status Delecao ID 2 (Esperado 0): %d\n", res_del);
-  printf("   - Status Delecao ID 888 (Esperado -2): %d\n", res_fantasma);
 
   return EXIT_SUCCESS;
 }
