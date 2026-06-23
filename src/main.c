@@ -1,13 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "../include/task.h" /* Importando o contrato que você acabou de criar */
 
 int main(int argc, char *argv[]) {
-    /* Como ativamos a flag -Werror, se declararmos argc/argv e não usarmos, 
-       o compilador trata o 'warning' como erro fatal. 
-       Fazer um cast para (void) é a técnica padrão em C para dizer: "Eu sei que está aqui". */
     (void)argc;
     (void)argv;
 
-    printf("Task Manager CLI v0.1.0 - [Build: PASSED] Motor de compilação operacional.\n");
+    /* Declarando uma variável 't' do tipo Task na Stack (Pilha de memória) */
+    Task t;
+
+    /* Populando a struct para testar se os tipos batem com o contrato */
+    t.id = 1001;
+    t.priority = 3;
+    t.status = STATUS_TODO;
+
+    printf("Task Manager CLI v0.1.0\n");
+    printf("-> Contrato de Dominio (task.h) validado com sucesso!\n");
+    printf("-> Teste de Atribuicao: ID %d | Prioridade %d | Status %d\n", t.id, t.priority, t.status);
+    
+    /* O %zu é o formatador nativo do C99 para o tipo 'size_t' devolvido pelo sizeof() */
+    printf("-> Tamanho da struct 'Task' em memoria: %zu bytes.\n", sizeof(Task));
+
     return EXIT_SUCCESS;
 }
