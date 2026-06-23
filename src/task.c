@@ -152,3 +152,33 @@ int update_task_status(Task *tasks_array, int count, int task_id,
   target->status = new_status;
   return 0; /* Mutação realizada com sucesso */
 }
+
+int delete_task_by_id(Task *tasks_array, int *current_count, int task_id) {
+  if (tasks_array == NULL || current_count == NULL || *current_count <= 0) {
+    return -1; /* Erro: Parâmetros inválidos ou banco vazio */
+  }
+
+  int target_index = -1;
+  for (int i = 0; i < *current_count; i++) {
+    if (tasks_array[i].id == task_id) {
+      target_index = i;
+      break;
+    }
+  }
+
+  if (target_index == -1) {
+    return -2; /* Erro: Alvo inexistente */
+  }
+
+  /* O motor do deslocamento contíguo (Shift Left) */
+  for (int i = target_index; i < (*current_count) - 1; i++) {
+    tasks_array[i] = tasks_array[i + 1];
+  }
+
+  /* Sanitização do "fantasma" que sobrou no final do vetor */
+  memset(&tasks_array[(*current_count) - 1], 0, sizeof(Task));
+
+  (*current_count)--;
+
+  return 0; /* Tarefa ceifada com sucesso */
+}
