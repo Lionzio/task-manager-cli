@@ -37,4 +37,7 @@ Task *find_task_by_id(Task *tasks_array, int count, int task_id);
 int update_task_status(Task *tasks_array, int count, int task_id,
                        TaskStatus new_status);
 
+/* A LINHA QUE FALTAVA: Assinatura do contrato para o main.c poder enxergar */
+int delete_task_by_id(Task *tasks_array, int *current_count, int task_id);
+
 #endif /* TASK_H */
