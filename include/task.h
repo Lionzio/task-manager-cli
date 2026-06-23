@@ -26,4 +26,8 @@ typedef struct {
     time_t created_at;      /**< Timestamp UTC de quando a tarefa nasceu */
 } Task;
 
+    #define MAX_TASKS 100
+
+    int create_task(Task *tasks_array, int *current_count, int max_capacity, const char *title, const char *description, int priority);
+
 #endif /* TASK_H */
