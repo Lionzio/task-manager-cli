@@ -121,3 +121,34 @@ void list_tasks(const Task *tasks_array, int count) {
 
   printf("%s", hline);
 }
+
+/* --- ADICIONE ESTE BLOCO AO FINAL DE src/task.c --- */
+
+Task *find_task_by_id(Task *tasks_array, int count, int task_id) {
+  if (tasks_array == NULL || count <= 0) {
+    return NULL;
+  }
+
+  for (int i = 0; i < count; i++) {
+    if (tasks_array[i].id == task_id) {
+      return &tasks_array[i]; /* Retorna o endereço exato da struct na Stack */
+    }
+  }
+
+  return NULL; /* Alvo não encontrado */
+}
+
+int update_task_status(Task *tasks_array, int count, int task_id,
+                       TaskStatus new_status) {
+  if (tasks_array == NULL || count <= 0) {
+    return -1; /* Erro: Parâmetros inválidos */
+  }
+
+  Task *target = find_task_by_id(tasks_array, count, task_id);
+  if (target == NULL) {
+    return -2; /* Erro: Tarefa inexistente */
+  }
+
+  target->status = new_status;
+  return 0; /* Mutação realizada com sucesso */
+}

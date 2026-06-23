@@ -6,35 +6,37 @@ int main(int argc, char *argv[]) {
   (void)argc;
   (void)argv;
 
-  /* O pulo do gato: '= {0}' garante que todos os 22.000 bytes do vetor nasçam
-   * como ZERO limpo */
   Task minhas_tarefas[MAX_TASKS] = {0};
   int total = 0;
 
-  printf("=== TESTE DA SPRINT 3: MOTOR DE LISTAGEM ASCII ===\n\n");
+  printf("=== TESTE DA SPRINT 4: MUTAÇÃO DE ESTADO ===\n\n");
 
-  /* Teste A: Comportamento com a lista vazia */
-  printf("-> CENARIO A: Imprimindo banco de dados vazio:\n");
+  /* Cadastrando 2 tarefas no estado padrão (STATUS_TODO = [Pendente]) */
+  create_task(minhas_tarefas, &total, MAX_TASKS, "Estudar Modelagem de Banco",
+              "Formas Normais", 3);
+  create_task(minhas_tarefas, &total, MAX_TASKS, "Corrigir bug no Makefile",
+              "Tabulacoes", 2);
+
+  printf("-> ANTES DA MUTAÇÃO (Ambas devem estar [Pendente]):\n");
   list_tasks(minhas_tarefas, total);
-  printf("\n");
 
-  /* Populando com dados variados */
-  create_task(minhas_tarefas, &total, MAX_TASKS, "Configurar Neovim",
-              "Instalar LSP de C", 3);
-  create_task(minhas_tarefas, &total, MAX_TASKS, "Comprar Cafe moido",
-              "Grao 100% Arabica", 1);
+  /* Disparando as mutações */
+  printf("\n-> Aplicando mutações no Banco de Dados em Memória...\n");
 
-  /* Teste B de Estresse: Um título gigante que tentará quebrar a tabela! */
-  create_task(
-      minhas_tarefas, &total, MAX_TASKS,
-      "Ler a especificacao do POSIX sobre manipulacao de arquivos no Linux",
-      "Capitulo 4", 2);
+  int res1 = update_task_status(minhas_tarefas, total, 1, STATUS_IN_PROGRESS);
+  int res2 = update_task_status(minhas_tarefas, total, 2, STATUS_DONE);
 
-  /* Simulando que a segunda tarefa já foi iniciada */
-  minhas_tarefas[1].status = STATUS_IN_PROGRESS;
+  /* Testando a segurança contra um ID fantasma */
+  int res_fantasma =
+      update_task_status(minhas_tarefas, total, 999, STATUS_DONE);
 
-  printf("-> CENARIO B: Imprimindo tabela com %d itens:\n", total);
+  printf("\n-> DEPOIS DA MUTAÇÃO:\n");
   list_tasks(minhas_tarefas, total);
+
+  printf("\n-> AUDITORIA DE CÓDIGOS DE RETORNO:\n");
+  printf("   - Mutação ID 1 (Esperado 0): %d\n", res1);
+  printf("   - Mutação ID 2 (Esperado 0): %d\n", res2);
+  printf("   - Mutação ID Fantasma 999 (Esperado -2): %d\n", res_fantasma);
 
   return EXIT_SUCCESS;
 }

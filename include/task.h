@@ -33,4 +33,8 @@ int create_task(Task *tasks_array, int *current_count, int max_capacity,
                 const char *title, const char *description, int priority);
 void list_tasks(const Task *tasks_array, int count);
 
+Task *find_task_by_id(Task *tasks_array, int count, int task_id);
+int update_task_status(Task *tasks_array, int count, int task_id,
+                       TaskStatus new_status);
+
 #endif /* TASK_H */
