@@ -1,5 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -std=c99 -pedantic
+RELEASE_FLAGS = -O3 -static
 
 all: bin/task-cli.exe
 
@@ -15,10 +16,13 @@ build/task.o: src/task.c include/task.h
 build/file_io.o: src/file_io.c include/file_io.h include/task.h
 	$(CC) $(CFLAGS) -c src/file_io.c -o build/file_io.o
 
-# NOVA ENGRENAGEM: Target isolado para compilar e rodar a suíte de testes
 test: build/task.o build/file_io.o tests/test_main.c
 	$(CC) $(CFLAGS) build/task.o build/file_io.o tests/test_main.c -o bin/test_runner.exe
 	.\bin\test_runner.exe
+
+# A ENGRENAGEM DE PRODUÇÃO: Compilação absoluta de otimização e embutimento de DLLs
+release: src/main.c src/task.c src/file_io.c
+	$(CC) $(CFLAGS) $(RELEASE_FLAGS) src/main.c src/task.c src/file_io.c -o bin/task-cli.exe
 
 run: all
 	.\bin\task-cli.exe
